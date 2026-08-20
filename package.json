@@ -1,0 +1,14 @@
+{
+  "name": "agentic-ai-tooling",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Meta-tooling for this repo (Node scripts). The Pokemon API itself lives in java/ and dotnet/ -- see CLAUDE.md.",
+  "scripts": {
+    "self:review": "node tools/self-improve/bin/self-review.js",
+    "self:stats": "node tools/self-improve/bin/self-stats.js",
+    "self:extract-insights": "node tools/self-improve/bin/self-extract-insights.js",
+    "self:approve": "node tools/self-improve/bin/self-approve.js",
+    "self:reject": "node tools/self-improve/bin/self-reject.js",
+    "self:sweep": "node tools/self-improve/bin/self-sweep.js"
+  }
+}

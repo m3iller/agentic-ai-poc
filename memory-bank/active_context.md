@@ -3,10 +3,13 @@
 *Last updated: 2026-08-20*
 
 ## Current focus
-Set up a `memory-bank/` for this repo (this file set) plus a Stop hook that auto-appends a
-session summary to [[progress]]'s Session Log. Not a product feature — tooling/process work so
-future sessions (and the other subagents) get continuity without re-deriving decisions from
-scratch each time.
+Built `tools/self-improve/` — an ExpeL/Reflexion-style self-improvement pipeline over this
+project's own Claude Code session history (rule lifecycle, quality scoring, `SessionStart`
+injection hook). Not a product feature — same category as the `memory-bank/` setup below: process
+tooling for how sessions/subagents work in this repo, not for the Pokemon API itself. See
+[[progress]]'s Session Log for the full rundown and `tools/self-improve/README.md` for the design.
+No rules have been mined/accepted yet — the pipeline is built and smoke-tested but idle until a
+low-quality session (or a manual `self:extract-insights` run) gives it something to propose.
 
 ## Where the product work actually stands
 Per `specs/STATUS.md`: `pokeapi-integration` and `pokemon-enumeration` (US01) are **Done** in

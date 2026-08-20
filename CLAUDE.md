@@ -31,3 +31,14 @@ Not yet scaffolded — `dotnet-agent`'s first task establishes the solution. Onc
 expect the usual `dotnet build` / `dotnet test` / `dotnet run` from `dotnet/`.
 
 No linter is configured yet for either stack.
+
+### Self-improvement tooling (`tools/self-improve/`)
+Meta-tooling over this repo's *own* Claude Code session history — not part of the product.
+Mines past sessions for failure patterns (ExpeL/Reflexion-style) and manages a rule lifecycle
+(`memory-bank/rules.json`/`rules.md`) whose accepted rules get injected into context at session
+start. See `tools/self-improve/README.md` for the full design and its heuristics/limits.
+- `npm run self:review` — list rules by lifecycle status / trace a rule to its source session
+- `npm run self:stats` — session quality distribution + before/after-acceptance trend
+- `npm run self:extract-insights` — mine new proposed rules from recent sessions
+- `npm run self:approve -- <id>` / `npm run self:reject -- <id>` — supervised approval
+- `npm run self:sweep` — idle accepted/unused rules → unused → archived
