@@ -27,11 +27,17 @@ make an explicit call and log it in [[progress]], the way `pokeapi-integration` 
 category/skills/sprite/mass.
 
 ## Session continuity convention (how to use this memory bank going forward)
-- Read all five `memory-bank/*.md` files at the start of a session touching this project.
+- Read all five `memory-bank/*.md` files, plus recent files under `memory-bank/sessions/`, at
+  the start of a session touching this project.
 - `specs/` + `specs/STATUS.md` remain the source of truth for *what's built*; this memory bank
   is for *why*, decisions, and cross-session/cross-agent context specs don't capture.
+- Each session gets its own file: `memory-bank/sessions/YYYY-MM-DD-<slug>.md`, frontmatter
+  `session_id: <id>` + `date: <date>`. A `Stop` hook (`.claude/hooks/memory-bank-stop-check.sh`)
+  blocks the session end once if that file is missing, matched by `session_id` — not just "a
+  file dated today" — so two sessions on the same day each get recorded, not just the first.
+  (Superseded [[progress]]'s old Session Log section on 2026-08-20 — see its Key decisions log.)
 - When a decision is made (domain mapping, architecture trade-off, deliberate cross-stack
-  divergence), record it in [[progress]]'s Session Log and, if it changes ongoing direction,
-  reflect it here.
+  divergence), record it in the session file and, if it's durable beyond this session, also add
+  it to [[progress]]'s Key decisions log.
 - Update this file when the focus shifts to a new feature/task; keep it short — it's "what's
-  being worked on right now", not a full history (that's [[progress]]).
+  being worked on right now", not a full history (that's [[progress]] + `memory-bank/sessions/`).

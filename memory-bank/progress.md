@@ -34,6 +34,12 @@ narrative/decision trail around it, and is where session summaries get appended.
 - **2026-08-20**: introduced `memory-bank/` (this file set) + a Stop hook to auto-append session
   summaries here, so decisions and session continuity survive across sessions/subagents without
   relying on `specs/` (which intentionally stays product-scoped, not process/decision-scoped).
+- **2026-08-20**: replaced the Session Log below with one file per session under
+  `memory-bank/sessions/` (`YYYY-MM-DD-<slug>.md`, frontmatter carries `session_id`). The old
+  date-only check (`grep "^### {today}"` in `progress.md`) let a second same-day session pass the
+  Stop-hook gate for free without ever being recorded — checking `session_id` against the
+  `sessions/` directory closes that gap. This log (`## Key decisions log`) stays the durable
+  cross-session index; `sessions/*.md` holds the per-session narrative.
 - **2026-08-20**: added `tools/self-improve/` — a meta-tooling pipeline (ExpeL/Reflexion-style)
   that mines this project's own Claude Code session transcripts for failure patterns and
   proposes rules through a lifecycle (proposed→accepted→unused→archived) in
@@ -46,10 +52,10 @@ narrative/decision trail around it, and is where session summaries get appended.
   git commit (`chore(self-improve): ...`). See `tools/self-improve/README.md` for the full
   design and documented limits.
 
-## Session Log
-*(Newest first. Auto-appended by the Stop hook where possible; add manually otherwise. Keep each
-entry to a few lines — link out to specs/STATUS.md or other memory-bank files for detail rather
-than duplicating it here.)*
+## Session Log (historical — frozen 2026-08-20)
+*Superseded by `memory-bank/sessions/` (one file per session, gated by the Stop hook on
+`session_id` — see the 2026-08-20 decision above). The entries below predate that change and are
+kept as history; no new entries get appended here going forward.*
 
 ### 2026-08-20 — Self-improvement pipeline (`tools/self-improve/`)
 - Built the ExpeL/Reflexion-style self-improvement loop requested from a set of reference
