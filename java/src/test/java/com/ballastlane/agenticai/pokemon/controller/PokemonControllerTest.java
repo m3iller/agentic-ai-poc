@@ -1,8 +1,12 @@
 package com.ballastlane.agenticai.pokemon.controller;
 
+import com.ballastlane.agenticai.pokeapi.exception.PokeApiNotFoundException;
 import com.ballastlane.agenticai.pokeapi.exception.PokeApiUnavailableException;
+import com.ballastlane.agenticai.pokemon.service.EvolutionStage;
+import com.ballastlane.agenticai.pokemon.service.PokemonDetail;
 import com.ballastlane.agenticai.pokemon.service.PokemonPage;
 import com.ballastlane.agenticai.pokemon.service.PokemonService;
+import com.ballastlane.agenticai.pokemon.service.PokemonStat;
 import com.ballastlane.agenticai.pokemon.service.PokemonSummary;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,5 +96,61 @@ class PokemonControllerTest {
 
         mockMvc.perform(get("/api/pokemon"))
                 .andExpect(status().isServiceUnavailable());
+    }
+
+    private PokemonDetail sampleDetail() {
+        EvolutionStage venusaur = new EvolutionStage("venusaur", List.of());
+        EvolutionStage ivysaur = new EvolutionStage("ivysaur", List.of(venusaur));
+        EvolutionStage bulbasaur = new EvolutionStage("bulbasaur", List.of(ivysaur));
+        return new PokemonDetail(
+                1L, "bulbasaur", "https://example.com/artwork.png", "Seed Pokémon", 69,
+                List.of("overgrow", "chlorophyll"),
+                List.of(new PokemonStat("hp", 45), new PokemonStat("attack", 49)),
+                "A strange seed was planted on its back at birth.",
+                bulbasaur);
+    }
+
+    @Test
+    void getDetailReturnsFullDetailView() throws Exception {
+        when(pokemonService.getPokemonDetail("bulbasaur")).thenReturn(sampleDetail());
+
+        mockMvc.perform(get("/api/pokemon/bulbasaur"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("bulbasaur"))
+                .andExpect(jsonPath("$.image").value("https://example.com/artwork.png"))
+                .andExpect(jsonPath("$.category").value("Seed Pokémon"))
+                .andExpect(jsonPath("$.mass").value(69))
+                .andExpect(jsonPath("$.skills[0]").value("overgrow"))
+                .andExpect(jsonPath("$.skills[1]").value("chlorophyll"))
+                .andExpect(jsonPath("$.stats[0].name").value("hp"))
+                .andExpect(jsonPath("$.stats[0].value").value(45))
+                .andExpect(jsonPath("$.stats[1].name").value("attack"))
+                .andExpect(jsonPath("$.stats[1].value").value(49))
+                .andExpect(jsonPath("$.description").value("A strange seed was planted on its back at birth."))
+                .andExpect(jsonPath("$.evolutionChain.name").value("bulbasaur"))
+                .andExpect(jsonPath("$.evolutionChain.evolvesTo[0].name").value("ivysaur"))
+                .andExpect(jsonPath("$.evolutionChain.evolvesTo[0].evolvesTo[0].name").value("venusaur"));
+
+        verify(pokemonService).getPokemonDetail("bulbasaur");
+    }
+
+    @Test
+    void getDetailByNumericIdPassesThroughToService() throws Exception {
+        when(pokemonService.getPokemonDetail("1")).thenReturn(sampleDetail());
+
+        mockMvc.perform(get("/api/pokemon/1"))
+                .andExpect(status().isOk());
+
+        verify(pokemonService).getPokemonDetail("1");
+    }
+
+    @Test
+    void getDetailWhenNotFoundReturnsNotFound() throws Exception {
+        when(pokemonService.getPokemonDetail("does-not-exist"))
+                .thenThrow(new PokeApiNotFoundException("PokeAPI resource not found"));
+
+        mockMvc.perform(get("/api/pokemon/does-not-exist"))
+                .andExpect(status().isNotFound());
     }
 }
