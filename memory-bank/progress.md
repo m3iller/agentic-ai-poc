@@ -34,11 +34,43 @@ narrative/decision trail around it, and is where session summaries get appended.
 - **2026-08-20**: introduced `memory-bank/` (this file set) + a Stop hook to auto-append session
   summaries here, so decisions and session continuity survive across sessions/subagents without
   relying on `specs/` (which intentionally stays product-scoped, not process/decision-scoped).
+- **2026-08-20**: replaced the Session Log below with one file per session under
+  `memory-bank/sessions/` (`YYYY-MM-DD-<slug>.md`, frontmatter carries `session_id`). The old
+  date-only check (`grep "^### {today}"` in `progress.md`) let a second same-day session pass the
+  Stop-hook gate for free without ever being recorded — checking `session_id` against the
+  `sessions/` directory closes that gap. This log (`## Key decisions log`) stays the durable
+  cross-session index; `sessions/*.md` holds the per-session narrative.
+- **2026-08-20**: added `tools/self-improve/` — a meta-tooling pipeline (ExpeL/Reflexion-style)
+  that mines this project's own Claude Code session transcripts for failure patterns and
+  proposes rules through a lifecycle (proposed→accepted→unused→archived) in
+  `memory-bank/rules.json`/`rules.md`. Accepted rules inject into context via a new
+  `SessionStart` hook (`.claude/hooks/inject-rules.sh`), not `UserPromptSubmit` — same
+  once-per-session load as `CLAUDE.md`, avoids re-injection cost every turn. Quality scoring is
+  an explicit heuristic (tool-error/retry rate — no real exit-criteria signal exists in the
+  transcript format); extraction shells out to `claude -p` for real ExpeL/Reflexion generation
+  when available, with a deterministic template fallback. Every lifecycle transition is its own
+  git commit (`chore(self-improve): ...`). See `tools/self-improve/README.md` for the full
+  design and documented limits.
 
-## Session Log
-*(Newest first. Auto-appended by the Stop hook where possible; add manually otherwise. Keep each
-entry to a few lines — link out to specs/STATUS.md or other memory-bank files for detail rather
-than duplicating it here.)*
+## Session Log (historical — frozen 2026-08-20)
+*Superseded by `memory-bank/sessions/` (one file per session, gated by the Stop hook on
+`session_id` — see the 2026-08-20 decision above). The entries below predate that change and are
+kept as history; no new entries get appended here going forward.*
+
+### 2026-08-20 — Self-improvement pipeline (`tools/self-improve/`)
+- Built the ExpeL/Reflexion-style self-improvement loop requested from a set of reference
+  slides: `tools/self-improve/{lib,bin}` (Node, zero deps), a rule store
+  (`memory-bank/rules.{json,md}`), and a `SessionStart` hook (`.claude/hooks/inject-rules.sh`)
+  that injects accepted rules into context.
+- npm scripts: `self:review`, `self:stats`, `self:extract-insights`, `self:approve`,
+  `self:reject`, `self:sweep` (root `package.json`, new — first Node tooling in this repo).
+- Key decisions (also logged above): SessionStart not UserPromptSubmit for injection; hits
+  track relevance not effectiveness; sweep commits batched per run, not per rule. Smoke-tested
+  against this project's real transcripts (`~/.claude/projects/...`) — 5 sessions, all scored
+  "high" quality, so extraction correctly found nothing to mine yet (no fabricated demo data
+  seeded into the store).
+- Not yet done: no rules have been proposed/accepted for real — that happens naturally once a
+  low-quality session shows up, or someone runs `self:extract-insights` after one.
 
 ### 2026-08-20 — Memory bank setup
 - Created `memory-bank/{project_brief,product_context,tech_context,active_context,progress}.md`,
