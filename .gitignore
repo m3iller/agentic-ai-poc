@@ -1,0 +1,17 @@
+target/
+*.class
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+.DS_Store
+
+# .NET
+dotnet/**/bin/
+dotnet/**/obj/
+*.user
+.vs/
+
+# Claude Code — machine-local settings/permissions, not shared
+.claude/settings.local.json

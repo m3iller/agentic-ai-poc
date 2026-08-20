@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: agentic-ai
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+
+pokeapi:
+  base-url: https://pokeapi.co/api/v2
